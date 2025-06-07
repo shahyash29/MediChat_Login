@@ -20,4 +20,4 @@ MediChat is a full-stack web application that uses a chatbot interface to allow 
 
 ---
 
-![chat_image](output/chat_image.png)
+![chat_image](./output/chat_image.png)
