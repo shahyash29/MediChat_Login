@@ -1,0 +1,180 @@
+/* 1. Root variables for easy theming */
+:root {
+  --bg-page: #2b2b2b;        /* dark gray around the window */
+  --bg-container: #000000;   /* pure black chat window */
+  --bg-bot: #1f1f1f;         /* dark bubble for bot */
+  --bg-user: #10a37f;        /* neon-green bubble for user */
+  --text-primary: #e5e5e5;   /* light text */
+  --text-secondary: #cbd5e1; /* secondary text */
+  --accent: #10a37f;         /* neon accent */
+  --font-family: "Inter", sans-serif;
+}
+
+/* 2. Overall page/body */
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-page);
+  font-family: var(--font-family);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  color: var(--text-primary);
+}
+
+/* 3. Chat container like ChatGPT */
+.chatbot-container {
+  width: 600px;           
+  max-width: 100%;
+  margin: 24px 0;
+  background: var(--bg-container);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 4. Header with subtle divider */
+#header {
+  background: var(--bg-container);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 16px 24px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 5. Conversation area grows to fill */
+#conversation {
+  flex: 1;
+  padding: 16px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--bg-container);
+}
+
+/* 6. Message bubbles */
+.chatbot-message {
+  max-width: 75%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  animation: message-fade-in 0.2s ease-out;
+  color: var(--text-primary);
+}
+
+.chatbot-message.bot {      /* incoming */
+  background: var(--bg-bot);
+  align-self: flex-start;
+}
+
+.chatbot-message.user {     /* outgoing */
+  background: var(--bg-user);
+  box-shadow: 0 0 8px rgba(16,163,127,0.6);
+  align-self: flex-end;
+}
+
+/* 7. Text styling inside bubbles */
+.chatbot-text {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+/* 8. Input area fixed at bottom */
+#input-form {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  background: var(--bg-container);
+}
+
+#input-field {
+  flex: 1;
+  height: 48px;
+  padding: 0 12px;
+  border: 1px solid #333;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  background: #1a1a1a;
+}
+
+#input-field:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(16,163,127,0.3);
+}
+
+#submit-button {
+  background: var(--accent);
+  border: none;
+  color: white;
+  margin-left: 12px;
+  padding: 0 16px;
+  height: 48px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s ease;
+}
+
+#submit-button:hover {
+  background: #0e8c65;
+}
+
+/* 9. Scrollbar (WebKit) */
+#conversation::-webkit-scrollbar {
+  width: 8px;
+}
+#conversation::-webkit-scrollbar-track {
+  background: transparent;
+}
+#conversation::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+}
+
+/* 10. Typing indicator (three dots) */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg-bot);
+  border-radius: 16px;
+  width: fit-content;
+  animation: message-fade-in 0.2s ease-out;
+}
+
+.typing-indicator span {
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  animation: blink 1.4s infinite both;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0; }
+  40% { opacity: 1; }
+}
+
+@keyframes message-fade-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
