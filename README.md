@@ -19,3 +19,5 @@ MediChat is a full-stack web application that uses a chatbot interface to allow 
   Logged-in users can interact with **Google Gemini AI** (Generative AI) for responses.<br>
 
 ---
+
+![chat_image](output/chat_image.png)
