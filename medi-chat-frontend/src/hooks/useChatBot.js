@@ -293,6 +293,9 @@ export function useChatBot() {
           );
           addMessage('bot', data.reply);
           break;
+
+          default:
+            break
       }
     } catch (err) {
       addMessage('bot', `${err.response?.data?.message || err.message}`);
@@ -301,7 +304,7 @@ export function useChatBot() {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
-
+  
   useEffect(() => {
     if (!hasInitialized.current) {
       addMessage('bot','Welcome to MediChat!');
