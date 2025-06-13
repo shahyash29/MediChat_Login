@@ -252,7 +252,7 @@ export function useChatBot() {
                 type: 'AFTER_REGISTER',
                 payload: {
                   sender: 'bot',
-                  text:   '✅ You have registered! Type “login” to log into the system.',
+                  text:   'You have registered! Type “login” to log into the system.',
                   timestamp: new Date().toLocaleTimeString()
                 }
               });
@@ -265,7 +265,7 @@ export function useChatBot() {
                 dispatch({ type: 'SET_STEP', payload: STEPS.START });
               } else {
                 addMessage('bot',
-                  `❌ Registration failed: ${err.response?.data?.message || err.message}`
+                  `Registration failed: ${err.response?.data?.message || err.message}`
                 );
                 dispatch({ type: 'RESET' });
               }
