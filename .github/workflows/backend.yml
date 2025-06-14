@@ -1,0 +1,38 @@
+# .github/workflows/backend.yml
+name: Backend CI/CD
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    # Check your code
+      - uses: actions/checkout@v3
+    
+    # Install Node 18
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+        
+    # install backend dependency
+      - name: Install Backend deps
+        working-directory: backend
+        run: npm ci --only=production
+    
+    # Log into DockerHub
+      - name: Docker Login
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" \
+            | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        
+    # Build and push image using that Dockerfile
+      - name: Build & Push Docker Image
+        run: |
+          docker build \
+            -f backend/Dockerfile \
+            -t ${{ secrets.DOCKER_USERNAME }}/chatbot_login-backend:latest \
+            backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/chatbot_login-backend:latest
+
