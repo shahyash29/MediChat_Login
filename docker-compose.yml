@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-app
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5001:5001"
+  
+  frontend:
+    build:
+      context: ./medi-chat-frontend
+      dockerfile: Dockerfile
+    container_name: frontend-app
+    ports:
+      - "3000:3000"
