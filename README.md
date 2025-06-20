@@ -26,9 +26,11 @@ MediChat is a full-stack web application that uses a chatbot interface to allow 
 
 ![Email_Services](images/emailone.png) <br>
 
+![Email_Services](images/emailThree.png)<br>
+
 ![Email_Services](images/emailTwo.png)<br>
 
-![Email_Services](images/emailThree.png)<br>
+
 
 
 
