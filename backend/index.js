@@ -9,6 +9,9 @@ const { User, Patient, Provider } = require('./models/user');
 
 const app = express();
 
+const accessCodes = new Map();
+const CODE_TL = 10 * 60 * 1000;
+
 app.use(
   cors({
     origin: '*',
@@ -108,42 +111,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.post('/api/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email, isVerified: true });
-    if (!user) {
-      return res.status(400).json({ message: 'No verified account found' });
-    }
 
-    const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign(
-      { sub: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    try {
-      console.log('Attempting to send email to:', email);
-      await sendEmail(
-        email,
-        'Login Successful',
-        'You have successfully logged in to MediChat.'
-      );
-    } catch (emailErr) {
-      console.warn('⚠️ Login email failed:', emailErr.message);
-    }
-
-    res.json({ name: user.name, token });
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ message: 'Server error during login' });
-  }
-});
 
 app.post('/api/chat', requireAuth, async (req, res) => {
   const { prompt } = req.body;
@@ -154,6 +122,76 @@ app.post('/api/chat', requireAuth, async (req, res) => {
   const text = await generation.response.text();
   res.json({ reply: text });
 });
+
+
+app.post('/api/send-access-code', async(req, res) => {
+  const {email} = req.body;
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+  accessCodes.set(email, {code, expires: Date.now() + CODE_TL});
+  try{
+    await sendEmail(
+      email,
+      'Your MediChat Access Code',
+      `Hi there,\n\nYour access code is **${code}**. It expires in 10 minutes.\n\n– MediChat Team`
+    );
+    console.log(`Access code ${code} sent to ${email}`);
+    res.json({ message: 'Access code sent.' });
+  } catch (err) {
+    console.warn('Failed to send access code email:', err);
+    res.status(500).json({ message: 'Failed to send code' });
+  }
+});
+
+app.post('/api/verify-code', async (req, res) => {
+  const { email, code } = req.body;
+  if (!email || !code) {
+    return res.status(400).json({ message: 'Email & code required.' });
+  }
+
+  const entry = accessCodes.get(email);
+  if (!entry || Date.now() > entry.expires) {
+    accessCodes.delete(email);
+    return res.status(400).json({ message: 'Access code expired or not found.' });
+  }
+  if (entry.code !== code) {
+    return res.status(400).json({ message: 'Invalid access code.' });
+  }
+
+
+  accessCodes.delete(email);
+
+
+  const user = await User.findOne({ email, isVerified: true });
+  if (!user) {
+    return res.status(400).json({ message: 'No registered account found.' });
+  }
+
+  
+  const token = jwt.sign(
+    { sub: user.id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+  );
+  try {
+    console.log('Attempting to send email to:', email);
+    await sendEmail(
+      email,
+      'Login Successful',
+      'You have successfully logged in to MediChat.'
+    );
+  } catch (emailErr) {
+    console.warn('⚠️ Login email failed:', emailErr.message);
+  }
+  res.json({ name: user.name, token });
+  
+});
+
+
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Backend listening on http://localhost:${PORT}`));

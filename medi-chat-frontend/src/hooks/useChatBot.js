@@ -139,35 +139,59 @@ export function useChatBot() {
           if (text.toLowerCase() === 'login') dispatch({ type: 'SET_STEP', payload: STEPS.ASK_EMAIL });
           break;
 
+        // case STEPS.ASK_EMAIL: {
+        //   if (!validators.email(text)) {
+        //     addMessage('bot', 'Invalid email format.');
+        //     break;
+        //   }
+        //   dispatch({ type: 'SET_USER', payload: { email: text } });
+        //   addMessage('bot','Sending access code…');
+        //   await axios.post(`${API_URL}/api/send-access-code`, { email: text });
+        //   addMessage('bot','Code sent! Please enter the 6-digit code:');
+        //   dispatch({ type: 'SET_STEP', payload: STEPS.VERIFY });
+        //   // const { data } = await axios.post(`${API_URL}/api/check-user`, { email: text });
+        //   // if (data.exists) {
+        //   //   addMessage('bot', 'Found. Enter password:');
+        //   //   dispatch({ type: 'SET_STEP', payload: STEPS.LOGIN });
+        //   // } else {
+        //   //   addMessage('bot', 'Not registered. Type “register” to sign up.');
+        //   //   dispatch({ type: 'SET_STEP', payload: STEPS.START });
+        //   // }
+        //   break;
+        // }
+
         case STEPS.ASK_EMAIL: {
           if (!validators.email(text)) {
-            addMessage('bot', 'Invalid email format.');
+            addMessage('bot','⚠️ Invalid email format.');
             break;
           }
           dispatch({ type: 'SET_USER', payload: { email: text } });
-          addMessage('bot', 'Checking…');
-          const { data } = await axios.post(`${API_URL}/api/check-user`, { email: text });
-          if (data.exists) {
-            addMessage('bot', 'Found. Enter password:');
-            dispatch({ type: 'SET_STEP', payload: STEPS.LOGIN });
-          } else {
-            addMessage('bot', 'Not registered. Type “register” to sign up.');
-            dispatch({ type: 'SET_STEP', payload: STEPS.START });
+          addMessage('bot','Sending access code…');
+          try {
+            await axios.post(`${API_URL}/api/send-access-code`, { email: text });
+            addMessage('bot','Code sent! Please enter the 6-digit code you received by email.');
+            dispatch({ type: 'SET_STEP', payload: STEPS.VERIFY });
+          } catch (err) {
+            addMessage('bot', `Could not send code: ${err.response?.data?.message || err.message}`);
+          }
+          break;
+        }
+        case STEPS.VERIFY: {
+          addMessage('bot','Verifying code…');
+          try {
+            const { data } = await axios.post(`${API_URL}/api/verify-code`, {
+              email: state.userData.email,
+              code:  text.trim()
+            });
+            localStorage.setItem('token', data.token);
+            addMessage('bot', `Logged in as ${data.name}!`);
+            dispatch({ type: 'SET_STEP', payload: STEPS.CHAT });
+          } catch (err) {
+            addMessage('bot', `${err.response?.data?.message || 'Verification failed.'}`);
           }
           break;
         }
 
-        case STEPS.LOGIN: {
-          const pwdHash = CryptoJS.SHA256(text).toString();
-          const res = await axios.post(`${API_URL}/api/login`, {
-            email: state.userData.email,
-            password: pwdHash
-          });
-          localStorage.setItem('token', res.data.token);
-          addMessage('bot', `Logged in as ${res.data.name}!`);
-          dispatch({ type: 'SET_STEP', payload: STEPS.CHAT });
-          break;
-        }
 
         case STEPS.CHOOSE_ROLE: {
           const lower = text.toLowerCase();
@@ -273,16 +297,6 @@ export function useChatBot() {
           }
           break;
         }
-
-        case STEPS.VERIFY:
-          await axios.post(`${API_URL}/api/verify-code`, {
-            email: state.userData.email,
-            code:  text
-          });
-          dispatch({ type: 'RESET' });
-          addMessage('bot','Verified! Type “login” to sign in.');
-          dispatch({ type: 'SET_STEP', payload: STEPS.POST_REGISTER });
-          break;
 
         case STEPS.CHAT:
           addMessage('bot','…thinking…');
