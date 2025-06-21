@@ -1,6 +1,7 @@
 # MediChat – Agentic AI-Powered Registration & Login System
 
-MediChat is a full-stack web application that uses a chatbot interface to allow **patients** and **healthcare providers** to register, log in, and chat with an AI assistant. It supports secure authentication, role-based data capture, and sends confirmation emails using **Azure Communication Services**.<br>
+MediChat is an **agentic AI-powered web application** featuring a conversational chatbot interface that enables **patients** and **healthcare providers** to seamlessly register, authenticate using **time-limited access codes**, and interact with an intelligent AI assistant. It provides robust, token-based security, captures role-specific user details, and dispatches confirmation and login notifications through **Azure Communication Services**.
+
 
 ---
 
