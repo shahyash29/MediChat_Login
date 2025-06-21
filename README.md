@@ -33,33 +33,28 @@ A "Logout" button clears the token and redirects the user back to the chatbot lo
 ## Getting Started
 
 1. **Clone the repo**
-
-git clone https://github.com/yourusername/medichat.git <br>
+      git clone https://github.com/yourusername/medichat.git <br>
 
 2. **Create environment file**
-
-cp .env.example .env <br>
-# Then edit .env with your credentials:
-# MONGO_URI, JWT_SECRET,
-# AZURE_COMM_EMAIL_CONNECTION_STRING,
-# SENDER_EMAIL_ADDRESS,
-# GEMINI_API_KEY,
+      cp .env.example .env <br>
+      Then edit .env with your credentials: <br>
+      MONGO_URI, JWT_SECRET,<br>
+      AZURE_COMM_EMAIL_CONNECTION_STRING,<br>
+      SENDER_EMAIL_ADDRESS,<br>
+      GEMINI_API_KEY,<br>
 
 3. **Run with Docker Compose**
-
-Option A (build locally): docker compose up --build -d <br>
-Option B (use pre-built images): <br>
-- docker compose pull <br>
-- docker compose up -d <br>
+      Option A (build locally): docker compose up --build -d <br>
+      Option B (use pre-built images): <br>
+      - docker compose pull <br>
+      - docker compose up -d <br>
 
 4. **Verify services**
-
-Backend: http://localhost:5001 <br>
-Frontend: http://localhost:3000/medichat <br>
+      Backend: http://localhost:5001 <br>
+      Frontend: http://localhost:3000/medichat <br>
 
 5. **Stop all services**
-
-docker compose down
+      docker compose down
 
 ![chat_image](images/chat_image.png) <br>
 
