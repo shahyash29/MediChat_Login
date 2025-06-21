@@ -1,16 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
 
-body {
-  margin: 0;
-  padding: 0;
-  background: #2b2b2b;
-  font-family: 'Lexend', sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  color: #e5e5e5;
-}
 
 .chat-container {
   width: 600px;

@@ -123,6 +123,21 @@ app.post('/api/chat', requireAuth, async (req, res) => {
   res.json({ reply: text });
 });
 
+app.get('/api/me', requireAuth, async (req, res) => {
+  try {
+    const user = await User
+      .findById(req.userId)
+      .select('-passwordHash -__v')
+      .lean();
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ user });
+  } catch (err) {
+    console.error('Error fetching profile:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 app.post('/api/send-access-code', async(req, res) => {
   const {email} = req.body;

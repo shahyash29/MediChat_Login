@@ -1,8 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useChatBot, STEPS } from '../hooks/useChatBot';
 import './ChatBot.css';
 
 export default function ChatBot() {
+  const navigate = useNavigate();
   const { state, handleText } = useChatBot();
   const { messages, step, promptsQueue, queueIndex, loading } = state;
   const [inputValue, setInputValue] = useState('');
@@ -12,41 +14,29 @@ export default function ChatBot() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const lastBotMsg = [...messages].reverse().find(m => m.sender === 'bot')?.text || '';
+  const lastBotMsg = [...messages]
+    .reverse()
+    .find(m => m.sender === 'bot')?.text || '';
 
-  const isRegistrationSuccess =
-    step === STEPS.POST_REGISTER && /registration successful/i.test(lastBotMsg);
-  const isLoginSuccess = step === STEPS.CHAT && /logged in/i.test(lastBotMsg);
+  const isLoginSuccess =
+    step === STEPS.CHAT && /logged in/i.test(lastBotMsg);
 
-  if (isRegistrationSuccess) {
-    return (
-      <div className="chat-container">
-        <div className="login-banner">
-          Registration successful! Please type “login” to sign in.
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (isLoginSuccess) {
+      navigate('/medichat/profile', { replace: true });
+    }
+  }, [isLoginSuccess, navigate]);
 
-  if (isLoginSuccess) {
-    return (
-      <div className="chat-container">
-        <div className="login-banner">
-          You have successfully logged in!
-        </div>
-      </div>
-    );
-  }
-
-  const currentKey = step === STEPS.REG_DETAILS
-    ? promptsQueue[queueIndex]?.key
-    : null;
-  const isOptional = ['npi', 'address2'].includes(currentKey);
-  const canSend = loading === false && (
+  const currentKey =
     step === STEPS.REG_DETAILS
+      ? promptsQueue[queueIndex]?.key
+      : null;
+  const isOptional = ['npi', 'address2'].includes(currentKey);
+  const canSend =
+    !loading &&
+    (step === STEPS.REG_DETAILS
       ? isOptional || inputValue.trim() !== ''
-      : inputValue.trim() !== ''
-  );
+      : inputValue.trim() !== '');
 
   const onSend = () => {
     handleText(inputValue);
@@ -58,7 +48,9 @@ export default function ChatBot() {
       <div className="chat-window">
         {messages.map((m, i) => (
           <div key={i} className={`msg ${m.sender}`} data-time={m.timestamp}>
-            <span className="avatar">{m.sender === 'bot' ? '🤖' : '👤'}</span>
+            <span className="avatar">
+              {m.sender === 'bot' ? '🤖' : '👤'}
+            </span>
             <span className="message-text">{m.text}</span>
           </div>
         ))}
@@ -67,7 +59,11 @@ export default function ChatBot() {
 
       <div className="chat-input">
         <input
-          type={[STEPS.LOGIN, STEPS.REG_PASS].includes(step) ? 'password' : 'text'}
+          type={
+            [STEPS.LOGIN, STEPS.REG_PASS].includes(step)
+              ? 'password'
+              : 'text'
+          }
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && canSend && onSend()}

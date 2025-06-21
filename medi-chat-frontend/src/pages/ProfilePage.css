@@ -1,0 +1,62 @@
+/* src/pages/ProfilePage.css */
+
+.profile-container {
+    width: 600px;
+    max-width: 100%;
+    margin: 24px auto;
+    background: #1f1f1f;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .profile-container h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #10a37f;
+  }
+  
+  .profile-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .profile-field:last-child {
+    border-bottom: none;
+  }
+  .profile-span-field{
+    margin-left:10px;
+  }
+  
+  .profile-field label {
+    font-weight: 500;
+    color: #e5e5e5;
+  }
+  
+  .profile-field span {
+    color: #fff;
+  }
+  
+  .logout-button {
+    align-self: flex-end;
+    padding: 12px 24px;
+    background: #10a37f;
+    border: none;
+    border-radius: 24px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  
+  .logout-button:hover {
+    background: #0e8c65;
+  }
+  
