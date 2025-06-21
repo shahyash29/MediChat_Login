@@ -6,6 +6,9 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const sendEmail = require('./utils/sendEmail');
 const { User, Patient, Provider } = require('./models/user');
+const expressWinston = require('express-winston');
+const logger         = require('./utils/logger');
+
 
 const app = express();
 
@@ -21,10 +24,18 @@ app.use(
 );
 app.use(express.json());
 
+app.use(expressWinston.logger({
+  winstonInstance:logger,
+  meta: true,
+  msg: "{{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms",
+  expressFormat: false,
+  colorize: false,
+}))
+
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error(err));
+  .then(() => logger.info('MongoDB connected'))
+  .catch(err => logger.error('MongoDB connection error', { message: err.message }));
 
 function requireAuth(req, res, next) {
   const auth = req.headers.authorization || '';
@@ -41,6 +52,7 @@ function requireAuth(req, res, next) {
 app.post('/api/check-user', async (req, res) => {
   const { email } = req.body;
   const exists = await User.exists({ email });
+  logger.debug('Checked user existence', { email, exists });;
   res.json({ exists: Boolean(exists) });
 });
 
@@ -103,10 +115,10 @@ app.post('/api/register', async (req, res) => {
     } catch (emailErr) {
       console.warn('⚠️ Email failed to send:', emailErr.message);
     }
-
+    logger.info('Registration successful', { email });
     res.json({ name: userDoc.name, token });
   } catch (err) {
-    console.error('Registration error:', err);
+    logger.error('Registration error', { error: err.message, stack: err.stack });
     res.status(500).json({ message: 'Server error during registration' });
   }
 });
@@ -132,9 +144,10 @@ app.get('/api/me', requireAuth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+    logger.debug('Fetched profile', { userId: req.userId });
     res.json({ user });
   } catch (err) {
-    console.error('Error fetching profile:', err);
+    logger.error('Error fetching profile', { error: err.message });
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -154,10 +167,10 @@ app.post('/api/send-access-code', async(req, res) => {
       'Your MediChat Access Code',
       `Hi there,\n\nYour access code is **${code}**. It expires in 10 minutes.\n\n– MediChat Team`
     );
-    console.log(`Access code ${code} sent to ${email}`);
+    logger.info('Access code sent', { email, code });
     res.json({ message: 'Access code sent.' });
   } catch (err) {
-    console.warn('Failed to send access code email:', err);
+    logger.warn('Failed to send access code email', { email, error: err.message });
     res.status(500).json({ message: 'Failed to send code' });
   }
 });
@@ -193,15 +206,17 @@ app.post('/api/verify-code', async (req, res) => {
     { expiresIn: '1h' }
   );
   try {
-    console.log('Attempting to send email to:', email);
+    logger.info('Access-code login successful', { email });
     await sendEmail(
       email,
       'Login Successful',
       'You have successfully logged in to MediChat.'
     );
   } catch (emailErr) {
+    llogger.error('Verify-code error', { error: err.message });
     console.warn('⚠️ Login email failed:', emailErr.message);
   }
+  
   res.json({ name: user.name, token });
   
 });
