@@ -32,10 +32,10 @@ A "Logout" button clears the token and redirects the user back to the chatbot lo
 
 ## Getting Started
 
-1. **Clone the repo**
+1. **Clone the repo** <br>
       git clone https://github.com/yourusername/medichat.git <br>
 
-2. **Create environment file**
+2. **Create environment file** <br>
       cp .env.example .env <br>
       Then edit .env with your credentials: <br>
       MONGO_URI, JWT_SECRET,<br>
@@ -43,18 +43,18 @@ A "Logout" button clears the token and redirects the user back to the chatbot lo
       SENDER_EMAIL_ADDRESS,<br>
       GEMINI_API_KEY,<br>
 
-3. **Run with Docker Compose**
+3. **Run with Docker Compose** <br>
       Option A (build locally): docker compose up --build -d <br>
       Option B (use pre-built images): <br>
       - docker compose pull <br>
       - docker compose up -d <br>
 
-4. **Verify services**
+4. **Verify services** <br>
       Backend: http://localhost:5001 <br>
       Frontend: http://localhost:3000/medichat <br>
 
-5. **Stop all services**
-      docker compose down
+5. **Stop all services** <br>
+      docker compose down <br>
 
 ![chat_image](images/chat_image.png) <br>
 
