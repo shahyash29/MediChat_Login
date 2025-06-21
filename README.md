@@ -18,7 +18,7 @@ MediChat is a full-stack web application that uses a chatbot interface to allow 
 - **AI Chat Integration**  
   Logged-in users can interact with **Google Gemini AI** (Generative AI) for responses.<br>
 
-- **Profile Page**
+- **Profile Page** <br>
   After successful login, users are automatically redirected to a protected profile page (/medichat/profile) where their personal details (for patients) or institution details (for providers) are displayed, with an option to log out.
 
 ---
