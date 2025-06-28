@@ -105,75 +105,61 @@ describe('MediChat E2E - Register Flow', function () {
     if (driver) await driver.quit();
   });
 
+  const send = async (text) => {
+    console.log(`>>> Sending: ${text}`);
+
+    const before = await driver.findElements(By.css('.msg.bot .message-text'));
+    const countBefore = before.length;
+
+    await driver.wait(until.elementLocated(By.css('.chat-input input')), 15000);
+    const input = await driver.findElement(By.css('.chat-input input'));
+    await driver.wait(until.elementIsVisible(input), 5000);
+    await driver.wait(until.elementIsEnabled(input), 5000);
+    await input.sendKeys(text, Key.RETURN);
+
+    const newMessage = await driver.wait(async () => {
+      await driver.wait(until.elementLocated(By.css('.msg.bot .message-text')), 15000);
+      const last = await driver.findElement(By.css('.msg.bot .message-text:last-child'));
+      const txt = await last.getText();
+      if (txt !== '⏳ Registering your account…') return txt;
+
+      const after = await driver.findElements(By.css('.msg.bot .message-text'));
+      if (after.length !== countBefore) {
+        return await after[after.length - 1].getText();
+      }
+      return false;
+    }, 90000, 'Timed out waiting for bot response');
+
+    console.log(`>>> Bot said: ${newMessage}`);
+    return newMessage;
+  };
+
+  const waitForBotReply = async (pattern, timeout = 90000) => {
+    await driver.wait(until.elementLocated(By.css('.msg.bot .message-text')), 15000);
+    const start = Date.now();
+
+    return driver.wait(async () => {
+      try {
+        const bubbles = await driver.findElements(By.css('.msg.bot .message-text'));
+        if (!bubbles.length) return false;
+
+        const lastTxt = await bubbles[bubbles.length - 1].getText();
+        if (pattern.test(lastTxt)) return lastTxt;
+
+        const secs = Math.floor((Date.now() - start) / 1000);
+        console.log(`>>> [${secs}s] Waiting… Bot last said: ${lastTxt}`);
+        return false;
+      } catch (e) {
+        if (e.name !== 'StaleElementReferenceError') throw e;
+        return false;
+      }
+    }, timeout, `Timed out waiting for bot reply matching: ${pattern}`);
+  };
+
   it('registers a new patient successfully', async () => {
     await driver.get(FRONTEND);
     console.log('>>> Page loaded');
     await driver.sleep(2000);
-
-    const send = async (text) => {
-      console.log(`>>> Sending: ${text}`);
-
-      // capture how many bot messages we have before sending
-      const before  = await driver.findElements(By.css('.msg.bot .message-text'));
-      const countBefore = before.length;
-
-      await driver.wait(until.elementLocated(By.css('.chat-input input')), 15000);
-      const input = await driver.findElement(By.css('.chat-input input'));
-      await driver.wait(until.elementIsVisible(input), 5000);
-      await driver.wait(until.elementIsEnabled(input), 5000);
-      await input.sendKeys(text, Key.RETURN);
-
-      // ---------- wait for a reply ----------
-      const newMessage = await driver.wait(async () => {
-        /* 1️⃣ ensure at least one bot bubble exists */
-        await driver.wait(
-          until.elementLocated(By.css('.msg.bot .message-text')),
-          15000
-        );
-
-        /* 2️⃣ try the “text changed in same bubble” strategy */
-        const last = await driver.findElement(
-          By.css('.msg.bot .message-text:last-child')
-        );
-        const txt = await last.getText();
-        if (txt !== '⏳ Registering your account…') return txt;
-
-        /* 3️⃣ fallback: did a NEW bubble get added? (your old logic) */
-        const after = await driver.findElements(By.css('.msg.bot .message-text'));
-        if (after.length !== countBefore) {
-          return await after[after.length - 1].getText();
-        }
-        return false;
-      }, 90000, 'Timed out waiting for bot response');
-
-      console.log(`>>> Bot said: ${newMessage}`);
-      return newMessage;
-    };
-
-    const waitForBotReply = async (pattern, timeout = 90_000) => {
-      await driver.wait(
-        until.elementLocated(By.css('.msg.bot .message-text')),
-        15_000
-      );
-    
-      let bubbles    = await driver.findElements(By.css('.msg.bot .message-text'));
-      let lastBubble = bubbles[bubbles.length - 1];
-      let start      = Date.now();
-    
-      return driver.wait(async () => {
-        try {
-          bubbles    = await driver.findElements(By.css('.msg.bot .message-text'));
-          lastBubble = bubbles[bubbles.length - 1];
-          const txt  = await lastBubble.getText();
-          if (pattern.test(txt)) return txt;
-          return false;
-        } catch (e) {
-          if (e.name !== 'StaleElementReferenceError') throw e;
-          return false;
-        }
-      }, timeout);
-    };
-    
 
     await send('register');
     await send('patient');
