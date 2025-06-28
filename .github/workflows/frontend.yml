@@ -54,7 +54,7 @@ jobs:
           --name selenium \
           --network host \
           --shm-size=2g \
-          selenium/standalone-chrome:4.21.0-20240618
+          seleniarm/standalone-chromium:latest
         npx wait-on http://localhost:4444/wd/hub/status
 
     # ---- Run E2E tests (unchanged test file) ----
