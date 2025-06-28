@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   backend:
     build:
@@ -9,11 +10,23 @@ services:
       - ./backend/.env
     ports:
       - "5001:5001"
-  
+
   frontend:
     build:
       context: ./medi-chat-frontend
       dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://backend:5001
     container_name: frontend-app
     ports:
       - "3000:3000"
+    depends_on:
+      - backend
+
+  selenium:
+    image: seleniarm/standalone-chromium:latest
+    container_name: selenium
+    ports:
+      - "4444:4444"
+    depends_on:
+      - frontend

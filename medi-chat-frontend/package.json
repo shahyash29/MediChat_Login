@@ -12,13 +12,14 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^6.30.1",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:e2e": "mocha tests/e2e/**/*.spec.js --timeout 120000 --exit",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -38,5 +39,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "chromedriver": "^137.0.0",
+    "mocha": "^11.7.1",
+    "selenium-webdriver": "^4.33.0"
   }
 }

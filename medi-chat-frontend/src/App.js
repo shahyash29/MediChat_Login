@@ -13,16 +13,16 @@ export default function App() {
     <Suspense fallback={<Loader />}>
       <div className="app-wrapper">     {/* centers the card */}
         <Routes>
-          <Route path="/medichat" element={<ChatPage />} />
+          <Route path="/" element={<ChatPage />} />
           <Route
-            path="/medichat/profile"
+            path="/profile"
             element={
               <PrivateRoute>
                 <ProfilePage />
               </PrivateRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/medichat" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </Suspense>

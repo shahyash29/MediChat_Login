@@ -190,9 +190,7 @@ app.post('/api/verify-code', async (req, res) => {
     return res.status(400).json({ message: 'Invalid access code.' });
   }
 
-
   accessCodes.delete(email);
-
 
   const user = await User.findOne({ email, isVerified: true });
   if (!user) {
