@@ -32,7 +32,7 @@ jobs:
         run: |
           npm ci
           npm start &                          # launch backend on :5001
-          npx wait-on http://localhost:5001/ --http-method GET  # wait until it's responding
+          npx wait-on http://localhost:5001 --http-method GET  # wait until it's responding
 
       - name: Install & build React
         working-directory: medi-chat-frontend
