@@ -28,19 +28,11 @@ jobs:
             | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
         
     # Build and push image using that Dockerfile
-      - name: Build & Push Frontend Docker Image
+      - name: Build & Push Docker Image
         run: |
-          # log in once before both pushes
-          echo "${{ secrets.DOCKER_PASSWORD }}" | \
-            docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-          # build image from medi-chat-frontend/Dockerfile
           docker build \
-            --build-arg REACT_APP_API_URL=${{ env.REACT_APP_API_URL }} \
-            -f medi-chat-frontend/Dockerfile \
-            -t ${{ secrets.DOCKER_USERNAME }}/chatbot_login-frontend:latest \
-            medi-chat-frontend
-
-          # push image
-          docker push ${{ secrets.DOCKER_USERNAME }}/chatbot_login-frontend:latest
-                
+            -f backend/Dockerfile \
+            -t ${{ secrets.DOCKER_USERNAME }}/chatbot_login-backend:latest \
+            backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/chatbot_login-backend:latest
+          
