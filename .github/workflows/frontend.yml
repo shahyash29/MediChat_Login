@@ -47,6 +47,15 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y google-chrome-stable chromium-chromedriver
 
+       - name: Start Selenium server
+        run: |
+          docker run -d \
+            --name selenium \
+            --network host \               
+            --shm-size=2g \
+            selenium/standalone-chrome:4.21.0-20240618
+          npx wait-on http://localhost:4444/wd/hub/status
+
       - name: Run Selenium E2E tests
         working-directory: medi-chat-frontend
         env:
