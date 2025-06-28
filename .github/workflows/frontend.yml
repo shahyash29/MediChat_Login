@@ -51,6 +51,8 @@ jobs:
 
       - name: Run Selenium E2E tests
         working-directory: medi-chat-frontend
+        env:
+          FRONTEND_URL: http://host.docker.internal:3000
         run: npm run test:e2e
 
       - name: Docker login

@@ -5,7 +5,7 @@ describe('MediChat E2E - Register Flow', function () {
   let driver;
   this.timeout(120000);
 
-  const FRONTEND = 'http://frontend:3000/medichat';
+  const FRONTEND = process.env.FRONTEND_URL || 'http://frontend:3000/medichat';
 
   before(async () => {
     console.log('>>> Starting WebDriver...');
