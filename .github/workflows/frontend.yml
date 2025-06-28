@@ -115,10 +115,16 @@ jobs:
       - name: Install Chrome & Chromedriver
         run: |
           sudo apt-get update
+          # Install Google Chrome
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | \
+            sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
           sudo apt-get install -y google-chrome-stable chromium-chromedriver
-          # ensure chromedriver is on your PATH
-          sudo ln -sf /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
-
+          # Verify installations
+          google-chrome --version
+          chromedriver --version
+          
       - name: Run Selenium E2E tests
         working-directory: medi-chat-frontend
         env:
