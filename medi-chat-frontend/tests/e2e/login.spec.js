@@ -1,74 +1,69 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
 const assert = require('assert');
-const os = require('os');
-const path = require('path');
 
 describe('MediChat E2E - Register Flow', function () {
   let driver;
-  this.timeout(180000);
+  this.timeout(120000);
 
-  const baseUrl = process.env.FRONTEND_URL || 'http://frontend:3000';
-  const FRONTEND = `${baseUrl}/medichat`;
+    const baseUrl = process.env.FRONTEND_URL || 'http://frontend:3000';
+    const FRONTEND = `${baseUrl}/medichat`;
+
 
   before(async () => {
-    const builder = new Builder().forBrowser('chrome');
-    const tmpProfile = path.join(os.tmpdir(), `selenium-${Date.now()}`);
-    const options = new chrome.Options()
-      .addArguments(
-        '--headless',
-        '--no-sandbox',
-        '--disable-dev-shm-usage',
-        `--user-data-dir=${tmpProfile}`
-      );
-    builder.setChromeOptions(options);
-    if (process.env.SELENIUM_URL) {
-      builder.usingServer(process.env.SELENIUM_URL);
-    }
-    driver = await builder.build();
+    console.log('>>> Starting WebDriver...');
+    driver = await new Builder()
+      .forBrowser('chrome')
+      .usingServer('http://localhost:4444/wd/hub')
+      .build();
+    console.log('>>> WebDriver ready');
   });
 
   after(async () => {
     if (driver) await driver.quit();
   });
 
-  async function send(text) {
-    const before = await driver.findElements(By.css('.msg.bot .message-text'));
-    const n0 = before.length;
-    const input = await driver.wait(
-      until.elementLocated(By.css('.chat-input input')),
-      15000
-    );
-    await driver.wait(until.elementIsVisible(input), 5000);
-    await driver.wait(until.elementIsEnabled(input), 5000);
-    await input.sendKeys(text, Key.RETURN);
-    const msg = await driver.wait(
-      async () => {
-        const after = await driver.findElements(By.css('.msg.bot .message-text'));
-        if (after.length !== n0) return after[after.length - 1].getText();
-        return false;
-      },
-      90000
-    );
-    return msg;
-  }
-
-  async function waitFor(pattern, timeout = 90000) {
-    const start = Date.now();
-    return driver.wait(
-      async () => {
-        const msgs = await driver.findElements(By.css('.msg.bot .message-text'));
-        if (!msgs.length) return false;
-        const last = await msgs[msgs.length - 1].getText();
-        return pattern.test(last) ? last : false;
-      },
-      timeout
-    );
-  }
-
   it('registers a new patient successfully', async () => {
     await driver.get(FRONTEND);
+    console.log('>>> Page loaded');
     await driver.sleep(2000);
+
+    const send = async (text) => {
+      console.log(`>>> Sending: ${text}`);
+      // capture how many bot messages we have before sending
+      const before = await driver.findElements(By.css('.msg.bot .message-text'));
+      const countBefore = before.length;
+
+      await driver.wait(until.elementLocated(By.css('.chat-input input')), 15000);
+      const input = await driver.findElement(By.css('.chat-input input'));
+      await driver.wait(until.elementIsVisible(input), 5000);
+      await driver.wait(until.elementIsEnabled(input), 5000);
+      await input.sendKeys(text, Key.RETURN);
+
+      // wait for ANY change in the number of bot messages (new spinner or final text)
+      const newMessage = await driver.wait(async () => {
+        const after = await driver.findElements(By.css('.msg.bot .message-text'));
+        if (after.length !== countBefore) {
+          return await after[after.length - 1].getText();
+        }
+        return false;
+      }, 90000, 'Timed out waiting for bot response');
+
+      console.log(`>>> Bot said: ${newMessage}`);
+      return newMessage;
+    };
+
+    const waitForBotReply = async (pattern, timeout = 90000) => {
+      const start = Date.now();
+      return await driver.wait(async () => {
+        const messages = await driver.findElements(By.css('.msg.bot .message-text'));
+        if (messages.length === 0) return false;
+        const last = await messages[messages.length - 1].getText();
+        const seconds = Math.floor((Date.now() - start) / 1000);
+        console.log(`>>> [${seconds}s] Waiting… Bot last said: ${last}`);
+        return pattern.test(last) ? last : false;
+      }, timeout, `Timed out waiting for bot reply matching: ${pattern}`);
+    };
+
     await send('register');
     await send('patient');
     await send('Test User');
@@ -78,7 +73,9 @@ describe('MediChat E2E - Register Flow', function () {
     await send('1234');
     await send('12345');
     await send('1234567890');
-    const final = await waitFor(/registered/i);
-    assert(/registered/i.test(final));
+
+    const finalMessage = await waitForBotReply(/registered/i, 90000);
+    console.log('>>> Final bot message:', finalMessage);
+    assert(/registered/i.test(finalMessage));
   });
 });
