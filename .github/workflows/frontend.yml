@@ -9,15 +9,14 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    # services:
-    #   selenium:
-    #     image: seleniarm/standalone-chromium:latest
-    #     ports:
-    #       - 4444:4444
-    #     options: >-
-    #       --add-host=host.docker.internal:host-gateway
-    #       --health-cmd="curl -f http://localhost:4444/wd/hub/status || exit 1"
-    #       --health-interval=10s
+    services:
+      selenium:
+        image: seleniarm/standalone-chromium:latest
+        ports:
+          - 4444:4444
+        options: >-
+          --health-cmd="curl -f http://localhost:4444/wd/hub/status || exit 1"
+          --health-interval=10s
 
     steps:
       - name: Checkout repository
@@ -50,18 +49,10 @@ jobs:
           serve -s build -l 3000 &            # serve production build on :3000
           npx wait-on --http-method GET http://localhost:3000/medichat 
 
-      - name: Install Chrome & Chromedriver
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser chromium-chromedriver
-          # ensure chromedriver is on your PATH
-          ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
-
       - name: Run Selenium E2E tests
         working-directory: medi-chat-frontend
         env:
           FRONTEND_URL: http://localhost:3000
-          SELENIUM_URL: http://localhost:4444/wd/hub  # unused now
         run: npm run test:e2e
 
       - name: Docker login
