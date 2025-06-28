@@ -15,6 +15,7 @@ jobs:
         ports:
           - 4444:4444
         options: >-
+          --add-host=host.docker.internal:host-gateway
           --health-cmd="curl -f http://localhost:4444/wd/hub/status || exit 1"
           --health-interval=10s
 
