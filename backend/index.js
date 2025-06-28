@@ -55,7 +55,7 @@ app.post('/api/check-user', async (req, res) => {
   logger.debug('Checked user existence', { email, exists });;
   res.json({ exists: Boolean(exists) });
 });
-
+app.get('/api/health', (_req, res) => res.sendStatus(200));
 app.post('/api/register', async (req, res) => {
   try {
     const { email, name, password, role, ...rest } = req.body;
