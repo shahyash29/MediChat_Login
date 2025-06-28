@@ -129,6 +129,7 @@ jobs:
         working-directory: medi-chat-frontend
         env:
           FRONTEND_URL: http://localhost:3000
+          SELENIUM_URL: http://localhost:4444/wd/hub
         run: npm run test:e2e
 
       - name: Docker login
@@ -140,7 +141,7 @@ jobs:
         working-directory: medi-chat-frontend
         run: |
           docker build \
-            --build-arg REACT_APP_API_URL=http://host.docker.internal:5001 \
+            --build-arg REACT_APP_API_URL=http://localhost:5001 \
             -f Dockerfile \
             -t ${{ secrets.DOCKER_USERNAME }}/frontend-chatbot:latest \
             .
