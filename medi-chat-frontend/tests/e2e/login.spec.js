@@ -41,11 +41,14 @@ describe('MediChat E2E - Register Flow', function () {
 
       // wait for ANY change in the number of bot messages (new spinner or final text)
       const newMessage = await driver.wait(async () => {
-        const after = await driver.findElements(By.css('.msg.bot .message-text'));
-        if (after.length !== countBefore) {
-          return await after[after.length - 1].getText();
-        }
-        return false;
+        // const after = await driver.findElements(By.css('.msg.bot .message-text'));
+        const last = await driver.findElement(By.css('.msg.bot .message-text:last-child'));
+        const txt  = await last.getText();
+        return txt !== '⏳ Registering your account…' ? txt : false;
+        // if (after.length !== countBefore) {
+        //   return await after[after.length - 1].getText();
+        // }
+        // return false;
       }, 90000, 'Timed out waiting for bot response');
 
       console.log(`>>> Bot said: ${newMessage}`);
