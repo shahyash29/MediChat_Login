@@ -37,15 +37,15 @@ jobs:
           serve -s build -l 3000 &
           npx wait-on http://localhost:3000/medichat
 
-      - name: Install Chrome & Chromedriver
-        run: |
-          sudo apt-get update -qq
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub \
-            | sudo apt-key add -
-          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" \
-            | sudo tee /etc/apt/sources.list.d/google-chrome.list
-          sudo apt-get update -qq
-          sudo apt-get install -y google-chrome-stable chromium-chromedriver
+      # - name: Install Chrome & Chromedriver
+      #   run: |
+      #     sudo apt-get update -qq
+      #     wget -q -O - https://dl.google.com/linux/linux_signing_key.pub \
+      #       | sudo apt-key add -
+      #     echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" \
+      #       | sudo tee /etc/apt/sources.list.d/google-chrome.list
+      #     sudo apt-get update -qq
+      #     sudo apt-get install -y google-chrome-stable chromium-chromedriver
 
       - name: Start Selenium server
         run: |
