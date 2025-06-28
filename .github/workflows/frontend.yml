@@ -29,8 +29,14 @@ jobs:
       working-directory: backend
       run: |
         npm ci
-        npm start &                       # start background server
+        npm start 2>&1 | tee backend.log &                         # start background server
         npx wait-on http://localhost:5001/api/health
+
+    - name: Dump backend log on failure
+      if: failure()                                 # runs only if a later step fails
+      run: |
+        echo "---- BACKEND LOG ----"
+        cat backend.log || true
 
     # ---- Build frontend (production bundle) ----
     - name: Build Frontend
