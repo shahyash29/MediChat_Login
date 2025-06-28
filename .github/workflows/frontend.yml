@@ -38,7 +38,7 @@ jobs:
       - name: Install & build React
         working-directory: medi-chat-frontend
         env:
-          REACT_APP_API_URL: http://backend:5001
+          REACT_APP_API_URL: http://localhost:5001
         run: |
           npm ci
           npm run build
