@@ -9,15 +9,27 @@ describe('MediChat E2E - Register Flow', function () {
     const FRONTEND = `${baseUrl}/medichat`;
 
 
-  before(async () => {
-    console.log('>>> Starting WebDriver...');
-    driver = await new Builder()
-      .forBrowser('chrome')
-      .usingServer('http://localhost:4444/wd/hub')
-      .build();
-    console.log('>>> WebDriver ready');
-  });
+//   before(async () => {
+//     console.log('>>> Starting WebDriver...');
+//     driver = await new Builder()
+//       .forBrowser('chrome')
+//       .usingServer('http://localhost:4444/wd/hub')
+//       .build();
+//     console.log('>>> WebDriver ready');
+//   });
 
+    before(async () => {
+        console.log('>>> Starting WebDriver...');
+        const builder = new Builder().forBrowser('chrome');
+        if (SEL_URL) {
+        console.log(`>>> Using remote Selenium at ${SEL_URL}`);
+        builder.usingServer(SEL_URL);
+        } else {
+        console.log('>>> Using local ChromeDriver');
+        }
+        driver = await builder.build();
+        console.log('>>> WebDriver ready');
+    });
   after(async () => {
     if (driver) await driver.quit();
   });
