@@ -150,52 +150,30 @@ describe('MediChat E2E - Register Flow', function () {
       return newMessage;
     };
 
-    const waitForBotReply = async (pattern, timeout = 90000) => {
-      const start = Date.now();
-    
-      // Always make sure at least one bubble exists
+    const waitForBotReply = async (pattern, timeout = 90_000) => {
       await driver.wait(
         until.elementLocated(By.css('.msg.bot .message-text')),
-        15_000,
-        'Bot never sent any message'
+        15_000
       );
     
-      // Track last bubble + its initial text
       let bubbles    = await driver.findElements(By.css('.msg.bot .message-text'));
       let lastBubble = bubbles[bubbles.length - 1];
-      let initialTxt = await lastBubble.getText();
+      let start      = Date.now();
     
       return driver.wait(async () => {
         try {
-          // Re-read last bubble every poll
-          let currentTxt = await lastBubble.getText();
-    
-          // Text changed? success?
-          if (currentTxt !== initialTxt) {
-            return pattern.test(currentTxt) ? currentTxt : false;
-          }
-    
-          // Or maybe a brand-new bubble got appended
-          bubbles = await driver.findElements(By.css('.msg.bot .message-text'));
-          if (bubbles.length > 0 && bubbles[bubbles.length - 1] !== lastBubble) {
-            lastBubble = bubbles[bubbles.length - 1];
-            currentTxt = await lastBubble.getText();
-            return pattern.test(currentTxt) ? currentTxt : false;
-          }
+          bubbles    = await driver.findElements(By.css('.msg.bot .message-text'));
+          lastBubble = bubbles[bubbles.length - 1];
+          const txt  = await lastBubble.getText();
+          if (pattern.test(txt)) return txt;
+          return false;
         } catch (e) {
-          // If the old bubble went stale, grab the new last bubble
-          if (e.name === 'StaleElementReferenceError') {
-            bubbles    = await driver.findElements(By.css('.msg.bot .message-text'));
-            lastBubble = bubbles[bubbles.length - 1];
-            initialTxt = await lastBubble.getText();
-          }
+          if (e.name !== 'StaleElementReferenceError') throw e;
+          return false;
         }
-    
-        const secs = Math.floor((Date.now() - start) / 1000);
-        console.log(`>>> [${secs}s] Waiting…`);
-        return false;
-      }, timeout, `Timed out waiting for bot reply matching: ${pattern}`);
+      }, timeout);
     };
+    
 
     await send('register');
     await send('patient');
