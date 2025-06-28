@@ -21,9 +21,9 @@ describe('MediChat E2E - Register Flow', function () {
     before(async () => {
         console.log('>>> Starting WebDriver...');
         const builder = new Builder().forBrowser('chrome');
-        if (SEL_URL) {
-        console.log(`>>> Using remote Selenium at ${SEL_URL}`);
-        builder.usingServer(SEL_URL);
+        if (process.env.SEL_URL) {
+        console.log(`>>> Using remote Selenium at ${process.env.SEL_URL}`);
+        builder.usingServer(process.env.SEL_URL);
         } else {
         console.log('>>> Using local ChromeDriver');
         }
