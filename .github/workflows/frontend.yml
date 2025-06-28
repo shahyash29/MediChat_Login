@@ -33,7 +33,7 @@ jobs:
         run: |
           npm ci
           npm start &                          # launch backend on :5001
-          npx wait-on --http-method GET http://localhost:5001/api/health   # wait until it's responding
+          npx wait-on --http-method GET http://host.docker.internal:5001/api/health   # wait until it's responding
 
       - name: Install & build React
         working-directory: medi-chat-frontend
@@ -48,7 +48,7 @@ jobs:
         run: |
           npm install -g serve
           serve -s build -l 3000 &            # serve production build on :3000
-          npx wait-on --http-method GET http://localhost:3000/medichat 
+          npx wait-on --http-method GET http://host.docker.internal:3000/medichat 
 
       - name: Run Selenium E2E tests
         working-directory: medi-chat-frontend
@@ -65,7 +65,7 @@ jobs:
         working-directory: medi-chat-frontend
         run: |
           docker build \
-            --build-arg REACT_APP_API_URL=http://backend:5001 \
+            --build-arg REACT_APP_API_URL=http://host.docker.internal:5001 \
             -f Dockerfile \
             -t ${{ secrets.DOCKER_USERNAME }}/frontend-chatbot:latest \
             .
